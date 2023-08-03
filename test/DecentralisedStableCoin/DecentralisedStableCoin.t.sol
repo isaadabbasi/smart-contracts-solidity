@@ -15,7 +15,7 @@ contract DecentralisedStableCoinTest is Test {
   
   function setUp() external {
     DeployDecentralisedStableCoin deployer = new DeployDecentralisedStableCoin();
-    dsc = deployer.run();
+    (dsc,,) = deployer.run();
   }
 
   function test_mintByNonAdmin() public {

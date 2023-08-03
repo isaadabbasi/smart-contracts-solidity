@@ -22,11 +22,11 @@ contract DecentralisedStableCoinEngine is IDecentralisedStableCoinEngine, Reentr
     // *** Types  *** //
 
     // *** Constants *** //
-    uint256 private constant FEED_PRECISION = 10e8;
-    uint256 private constant PRECISION = 10e18;
+    uint256 private constant FEED_PRECISION = 1e10;
+    uint256 private constant PRECISION = 1e18;
     uint256 private constant LIQUIDATION_THRESHOLD = 50; 
     uint256 private constant LIQUIDATION_PRECISION = 100; 
-    uint256 private constant MINIMUM_HEALTH_FACTOR = 1; 
+    uint256 private constant MINIMUM_HEALTH_FACTOR = 1;  
 
     // *** State Variables *** //
     mapping(address user => mapping(address token => uint256 balance)) private collateralDeposited;
@@ -70,7 +70,7 @@ contract DecentralisedStableCoinEngine is IDecentralisedStableCoinEngine, Reentr
         }
 
         // For example: USDC => BTC/USDC, USDT => BTC/USDT
-        for (uint64 i = 0; i < _tokens.length; i++) {
+        for (uint64 i = 0; i < _tokens.length; ++i) {
             priceFeed[_tokens[i]] = _priceFeeds[i];
             collateralTokens.push(_tokens[i]);
         }
@@ -107,7 +107,7 @@ contract DecentralisedStableCoinEngine is IDecentralisedStableCoinEngine, Reentr
 
         if (amount == 0) continue;
 
-        uint256 valueInUSD = _getTokenValue(token, amount);
+        uint256 valueInUSD = getTokenValue(token, amount);
         totalValueInUSD += valueInUSD;
       }
       return totalValueInUSD;
@@ -118,8 +118,7 @@ contract DecentralisedStableCoinEngine is IDecentralisedStableCoinEngine, Reentr
      * @param _amount Amount of BTC or ETH deposited (18 decimal)
      * @notice Returns the value of the token in USD
      */
-    function _getTokenValue(address _token, uint256 _amount) internal view returns (uint256) {
-      
+    function getTokenValue(address _token, uint256 _amount) public view returns (uint256) {
       AggregatorV3Interface aggregator = AggregatorV3Interface(priceFeed[_token]);
       (, int256 price,,,) = aggregator.latestRoundData();
       // _amount is also 18 decimate value. so $1000 = 1000 * 10e18;
