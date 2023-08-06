@@ -2,19 +2,19 @@
 pragma solidity ^0.8.18;
 
 interface IDecentralisedStableCoinEngine {
-  function burnDSC(uint256 _amount) external;
+  function burnDSC(uint256) external;
 
   function depositCollateral(address, uint256) external;
 
-  function depositCollateralAndMintDSC() external;
+  function depositCollateralAndMintDSC(address, uint256, uint256) external;
 
-  function getHealthFactor() external view;
+  function getHealthFactor(address) external view;
 
-  function liquidate() external;
+  function liquidate(address, address, uint256) external;
 
   function mintDsc(uint256) external;
 
-  function redeemCollateral() external;
+  function redeemCollateral(address, uint256) external;
 
-  function redeemCollateralForDsc() external;
+  function redeemCollateralForDsc(address, uint256, uint256) external;
 }
