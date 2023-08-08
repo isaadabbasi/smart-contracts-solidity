@@ -1,10 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.18;
 
+// *** System level packages ***
 import { Test } from "forge-std/Test.sol";
 import { console } from "forge-std/console.sol";
 
+// *** Installed libraries/packages ***
+import { ERC20Mock } from '@openzeppelin/contracts/mocks/ERC20Mock.sol';
+
+// *** Custom contracts *** //
 import { DecentralisedStableCoin } from '@DSC/DecentralisedStableCoin.sol';
+import { DecentralisedStableCoinEngine } from '@DSC/DecentralisedStableCoinEngine.sol';
 import { DeployDecentralisedStableCoin } from '@DSCScript/DeployDecentralisedStableCoin.s.sol';
 
 contract DecentralisedStableCoinTest is Test {
@@ -12,10 +18,11 @@ contract DecentralisedStableCoinTest is Test {
   address ALICE = makeAddr("1");
 
   DecentralisedStableCoin private dsc;
+  DecentralisedStableCoinEngine private engine;
   
   function setUp() external {
     DeployDecentralisedStableCoin deployer = new DeployDecentralisedStableCoin();
-    (dsc,,) = deployer.run();
+    (dsc, engine,) = deployer.run();
   }
 
   function test_mintByNonAdmin() public {
@@ -35,6 +42,7 @@ contract DecentralisedStableCoinTest is Test {
   }
 
   function test_mintSuccessOnValidArguments() public isOwner {
+    
     bool minted = dsc.mint(ALICE, 1);
     assertEq(minted, true);
 
@@ -53,12 +61,12 @@ contract DecentralisedStableCoinTest is Test {
     dsc.burn(0);
   }
 
-  function test_burnSuccessOnValidArguments() public isOwner {    
+  function test_burnSuccessOnValidArguments() public isOwner {
     // TODO - Implement later
   }
 
   modifier isOwner() {
-    vm.prank(msg.sender);
+    vm.prank(address(engine));
     _;
   }
 

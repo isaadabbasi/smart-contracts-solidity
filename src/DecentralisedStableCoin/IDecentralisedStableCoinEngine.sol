@@ -8,7 +8,7 @@ interface IDecentralisedStableCoinEngine {
 
   function depositCollateralAndMintDSC(address, uint256, uint256) external;
 
-  function getHealthFactor(address) external view;
+  function getHealthFactor(address) external view returns(uint256);
 
   function liquidate(address, address, uint256) external;
 
