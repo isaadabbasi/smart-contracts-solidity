@@ -11,7 +11,9 @@ remappings = [
   "@DSC/=src/DecentralisedStableCoin/",
   "@DSCTest/=test/DecentralisedStableCoin/",
   "@DSCScript/=script/DecentralisedStableCoin/",
+  
   "@mock/=test/mock/",
+  "@library/=src/library/",
 
 ]
 

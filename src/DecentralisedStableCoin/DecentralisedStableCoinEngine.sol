@@ -3,9 +3,10 @@ pragma solidity ^0.8.18;
 
 import {console} from "forge-std/console.sol";
 
+import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
+import {OracleLib} from "@library/OracleLib.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import {IERC20} from "@openzeppelin/contracts/interfaces/IERC20.sol";
-import {AggregatorV3Interface} from "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 
 import {DecentralisedStableCoin} from "./DecentralisedStableCoin.sol";
 import {IDecentralisedStableCoinEngine} from "./IDecentralisedStableCoinEngine.sol";
@@ -21,6 +22,8 @@ import {IDecentralisedStableCoinEngine} from "./IDecentralisedStableCoinEngine.s
  */
 
 contract DecentralisedStableCoinEngine is IDecentralisedStableCoinEngine, ReentrancyGuard {
+    // *** Premitive Proxies *** //
+    using OracleLib for AggregatorV3Interface;
 
     // *** Constants *** //
     uint256 private constant FEED_PRECISION = 1e10;
@@ -154,7 +157,7 @@ contract DecentralisedStableCoinEngine is IDecentralisedStableCoinEngine, Reentr
 
     function _getTokenAmountFromUSD(address _collateralToken, uint256 _usdAmountInWei) private view returns (uint256) {
         AggregatorV3Interface aggregator = AggregatorV3Interface(priceFeed[_collateralToken]);
-        (, int256 price,,,) = aggregator.latestRoundData();
+        (, int256 price,,,) = aggregator.staleCheckLatestRoundData();
 
         return (_usdAmountInWei * PRECISION) / (uint256(price) * FEED_PRECISION);
     }
@@ -166,7 +169,7 @@ contract DecentralisedStableCoinEngine is IDecentralisedStableCoinEngine, Reentr
      */
     function _getTokenValue(address _token, uint256 _amount) private view returns (uint256) {
         AggregatorV3Interface aggregator = AggregatorV3Interface(priceFeed[_token]);
-        (, int256 price,,,) = aggregator.latestRoundData();
+        (, int256 price,,,) = aggregator.staleCheckLatestRoundData();
         // _amount is also 18 decimate value. so $1000 = 1000 * 1e18;
         return ((uint256(price) * FEED_PRECISION) * _amount) / PRECISION;
     }
