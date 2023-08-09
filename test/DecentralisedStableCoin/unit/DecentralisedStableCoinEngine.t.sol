@@ -12,7 +12,7 @@ import {MockV3Aggregator} from "@mock/MockV3Aggregator.sol";
 ///*** Custom contracts *** */
 import {DecentralisedStableCoin} from "@DSC/DecentralisedStableCoin.sol";
 import {DecentralisedStableCoinEngine} from "@DSC/DecentralisedStableCoinEngine.sol";
-import {DeployDecentralisedStableCoin} from "@DSCScript/DeployDecentralisedStableCoin.s.sol";
+import {DeployDecentralisedStableCoinEngine} from "@DSCScript/DeployDecentralisedStableCoinEngine.s.sol";
 import {HelperConfig} from "@DSCScript/HelperConfig.s.sol";
 
 contract DecentralisedStableCoinEngineTest is Test {
@@ -41,7 +41,7 @@ contract DecentralisedStableCoinEngineTest is Test {
     address[] public feedAddresses;
 
     function setUp() external {
-        DeployDecentralisedStableCoin deployer = new DeployDecentralisedStableCoin();
+        DeployDecentralisedStableCoinEngine deployer = new DeployDecentralisedStableCoinEngine();
         (dsc, engine, config) = deployer.run();
         (wEth, wEthPriceFeed, wBTC, wBTCPriceFeed,) = config.active();
 

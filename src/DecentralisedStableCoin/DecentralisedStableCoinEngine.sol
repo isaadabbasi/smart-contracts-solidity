@@ -21,7 +21,6 @@ import {IDecentralisedStableCoinEngine} from "./IDecentralisedStableCoinEngine.s
  */
 
 contract DecentralisedStableCoinEngine is IDecentralisedStableCoinEngine, ReentrancyGuard {
-    // *** Types  *** //
 
     // *** Constants *** //
     uint256 private constant FEED_PRECISION = 1e10;
@@ -132,26 +131,28 @@ contract DecentralisedStableCoinEngine is IDecentralisedStableCoinEngine, Reentr
         totalCollateralValue = _getTotalCollateralValue(_user);
     }
 
+    function _getCollateralValue(address _user, address _collateralToken) private view returns (uint256) {
+        uint256 amount = collateralDeposited[_user][_collateralToken];
+
+        if (amount == 0) return 0;
+
+        return _getTokenValue(_collateralToken, amount);
+    }
+
     /**
      * @param _user user address for which we want to get the total value of collateral
      * @notice Returns the total value of collateral in USD
      */
     function _getTotalCollateralValue(address _user) internal view returns (uint256) {
         uint256 totalValueInUSD = 0;
-        uint256 iMax = collateralTokens.length;
-        for (uint32 i = 0; i < iMax; i++) {
-            address token = collateralTokens[i];
-            uint256 amount = collateralDeposited[_user][token];
-
-            if (amount == 0) continue;
-
-            uint256 valueInUSD = getTokenValue(token, amount);
-            totalValueInUSD += valueInUSD;
+        uint256 numOfCollateralTokens = collateralTokens.length;
+        for (uint32 i = 0; i < numOfCollateralTokens; i++) {
+            totalValueInUSD += _getCollateralValue(_user, collateralTokens[i]);
         }
         return totalValueInUSD;
     }
 
-    function getTokenAmountFromUSD(address _collateralToken, uint256 _usdAmountInWei) public view returns (uint256) {
+    function _getTokenAmountFromUSD(address _collateralToken, uint256 _usdAmountInWei) private view returns (uint256) {
         AggregatorV3Interface aggregator = AggregatorV3Interface(priceFeed[_collateralToken]);
         (, int256 price,,,) = aggregator.latestRoundData();
 
@@ -163,7 +164,7 @@ contract DecentralisedStableCoinEngine is IDecentralisedStableCoinEngine, Reentr
      * @param _amount Amount of BTC or ETH deposited (18 decimal)
      * @notice Returns the value of the token in USD
      */
-    function getTokenValue(address _token, uint256 _amount) public view returns (uint256) {
+    function _getTokenValue(address _token, uint256 _amount) private view returns (uint256) {
         AggregatorV3Interface aggregator = AggregatorV3Interface(priceFeed[_token]);
         (, int256 price,,,) = aggregator.latestRoundData();
         // _amount is also 18 decimate value. so $1000 = 1000 * 1e18;
@@ -320,7 +321,7 @@ contract DecentralisedStableCoinEngine is IDecentralisedStableCoinEngine, Reentr
             revert DSCEngine__HealthFactorOk();
         }
 
-        uint256 tokenAmountFromDebtCovered = getTokenAmountFromUSD(_collateralToken, _debtToCover);
+        uint256 tokenAmountFromDebtCovered = _getTokenAmountFromUSD(_collateralToken, _debtToCover);
         uint256 liquidatorBonus = (tokenAmountFromDebtCovered * LIQUIDATOR_BONUS) / LIQUIDATION_PRECISION;
         uint256 totalCollateralToRedeem = tokenAmountFromDebtCovered + liquidatorBonus;
         _redeemCollateral(_user, msg.sender, _collateralToken, totalCollateralToRedeem);
@@ -369,12 +370,32 @@ contract DecentralisedStableCoinEngine is IDecentralisedStableCoinEngine, Reentr
         return DSCMinted[_user];
     }
 
-    function getCollateralDeposited(address _user, address _token) public view returns (uint256) {
+    function getCollateralDepositedFor(address _user, address _token) public view returns (uint256) {
         return collateralDeposited[_user][_token];
     }
 
     function getHealthFactor(address _user) public view returns (uint256) {
         return _healthFactor(_user);
+    }
+
+    function getFeedFromCollateralToken(address _collateralToken) public view returns (address) {
+        return priceFeed[_collateralToken];
+    }
+
+    function getTotalCollateralValue(address _user) public view returns (uint256) {
+        return _getTotalCollateralValue(_user);
+    }
+
+    function getCollateralValue(address _user, address _collateralToken) public view returns (uint256) {
+        return _getCollateralValue(_user, _collateralToken);
+    }
+
+    function getTokenAmountFromUSD(address _collateralToken, uint256 _usdAmount) public view returns (uint256) {
+        return _getTokenAmountFromUSD(_collateralToken, _usdAmount);
+    }
+
+    function getTokenValue(address _token, uint256 _amount) public view returns (uint256) {
+        return _getTokenValue(_token, _amount);
     }
 
 }

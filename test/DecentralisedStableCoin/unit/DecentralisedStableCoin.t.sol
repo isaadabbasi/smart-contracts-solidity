@@ -11,7 +11,7 @@ import { ERC20Mock } from '@openzeppelin/contracts/mocks/ERC20Mock.sol';
 // *** Custom contracts *** //
 import { DecentralisedStableCoin } from '@DSC/DecentralisedStableCoin.sol';
 import { DecentralisedStableCoinEngine } from '@DSC/DecentralisedStableCoinEngine.sol';
-import { DeployDecentralisedStableCoin } from '@DSCScript/DeployDecentralisedStableCoin.s.sol';
+import { DeployDecentralisedStableCoinEngine } from '@DSCScript/DeployDecentralisedStableCoinEngine.s.sol';
 
 contract DecentralisedStableCoinTest is Test {
   
@@ -21,7 +21,7 @@ contract DecentralisedStableCoinTest is Test {
   DecentralisedStableCoinEngine private engine;
   
   function setUp() external {
-    DeployDecentralisedStableCoin deployer = new DeployDecentralisedStableCoin();
+    DeployDecentralisedStableCoinEngine deployer = new DeployDecentralisedStableCoinEngine();
     (dsc, engine,) = deployer.run();
   }
 

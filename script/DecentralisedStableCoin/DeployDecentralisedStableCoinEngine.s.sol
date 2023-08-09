@@ -8,7 +8,7 @@ import { DecentralisedStableCoin } from '@DSC/DecentralisedStableCoin.sol';
 import { DecentralisedStableCoinEngine } from '@DSC/DecentralisedStableCoinEngine.sol';
 import { HelperConfig } from '@DSCScript/HelperConfig.s.sol';
  
-contract DeployDecentralisedStableCoin is Script {
+contract DeployDecentralisedStableCoinEngine is Script {
 
   address[] priceFeeds;
   address[] tokens;
